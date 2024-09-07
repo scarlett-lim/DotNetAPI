@@ -8,6 +8,7 @@ public class UserController : ControllerBase
 {
     DataContextDapper _dapper;
 
+    // Contructor name must follow file name
     public UserController(IConfiguration config)
     {
         _dapper = new DataContextDapper(config);
@@ -19,16 +20,51 @@ public class UserController : ControllerBase
         return _dapper.LoadDataSingle<DateTime>("Select GETDATE()");
     }
 
-    [HttpGet("test/{testValue}")]
-    public string[] Test(string testValue)
+    [HttpGet("GetUsers")]
+    public IEnumerable<User> GetUsers()
     {
-        string[] responseArray = new string[] {
-            "test1",
-            "test2",
-            testValue
-        };
+        // The 1st sql query will causing the error if exceed certain character count, 
+        // take dapper as example, it has the maximum 4k count.
+        // for longer query, better to write in 2nd query
 
-        return responseArray;
+        # region 1st query
+        // string sql = @"SELECT  [UserId],
+        //                         [FirstName],
+        //                         [LastName],
+        //                         [Email],
+        //                         [Gender],
+        //                         [Active] 
+        //                 FROM TUTORIALAPPSCHEMA.USERS";
+        #endregion 
+
+        #region 2nd query
+        string sql = @"SELECT [UserId]," +
+                                "[FirstName], " +
+                                "[LastName], " +
+                                "[Email], " +
+                                "[Gender], " +
+                                "[Active] " +
+                        "FROM TUTORIALAPPSCHEMA.USERS";
+        #endregion
+
+        IEnumerable<User> users = _dapper.LoadData<User>(sql);
+        return users;
+    }
+
+    // Function name no need follow API name
+    [HttpGet("GetSingleUser/{userID}")]
+    public User GetSingleUserFromDatabase(int userID)
+    {
+        string sql = @"SELECT [UserId]," +
+                               "[FirstName], " +
+                               "[LastName], " +
+                               "[Email], " +
+                               "[Gender], " +
+                               "[Active] " +
+                       "FROM TUTORIALAPPSCHEMA.USERS " +
+                       "WHERE Userid = " + userID.ToString();
+        User user = _dapper.LoadDataSingle<User>(string.Format(sql));
+        return user;
     }
 
 }
