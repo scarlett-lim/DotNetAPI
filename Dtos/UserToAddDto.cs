@@ -1,8 +1,8 @@
-namespace DotnetAPI.Model
+namespace DotnetAPI.Dtos
 {
-    public partial class User
+    public partial class UserToAddDto
     {
-        public User()
+        public UserToAddDto()
         {
             FirstName ??= "";
 
@@ -13,9 +13,6 @@ namespace DotnetAPI.Model
             Gender ??= "";
 
         }
-
-
-        public int UserId { get; set; }
 
         public string FirstName { get; set; }
 

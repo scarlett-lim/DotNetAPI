@@ -1,4 +1,4 @@
-namespace DotnetAPI
+namespace DotnetAPI.Model
 {
     public partial class UserSalary
     {

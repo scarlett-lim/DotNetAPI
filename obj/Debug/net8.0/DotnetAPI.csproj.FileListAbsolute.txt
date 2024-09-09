@@ -70,3 +70,7 @@ D:\DotNetAPICourse-main\DotNetAPICourse-main\DotnetAPI\bin\Debug\net8.0\runtimes
 D:\DotNetAPICourse-main\DotNetAPICourse-main\DotnetAPI\bin\Debug\net8.0\runtimes\win-x64\native\Microsoft.Data.SqlClient.SNI.dll
 D:\DotNetAPICourse-main\DotNetAPICourse-main\DotnetAPI\bin\Debug\net8.0\runtimes\win-x86\native\Microsoft.Data.SqlClient.SNI.dll
 D:\DotNetAPICourse-main\DotNetAPICourse-main\DotnetAPI\bin\Debug\net8.0\runtimes\win\lib\net8.0\System.Runtime.Caching.dll
+D:\DotNetAPICourse-main\DotNetAPICourse-main\DotnetAPI\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.dll
+D:\DotNetAPICourse-main\DotNetAPICourse-main\DotnetAPI\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Abstractions.dll
+D:\DotNetAPICourse-main\DotNetAPICourse-main\DotnetAPI\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.Relational.dll
+D:\DotNetAPICourse-main\DotNetAPICourse-main\DotnetAPI\bin\Debug\net8.0\Microsoft.EntityFrameworkCore.SqlServer.dll
