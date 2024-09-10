@@ -11,5 +11,8 @@ namespace DotnetAPI.Data
         public void RemoveEntity<T>(T entityToRemove);
 
         public IEnumerable<User> GetUsers();
+
+        public User GetSingleUserFromDatabase(int userID);
+
     }
 }

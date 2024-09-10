@@ -36,5 +36,23 @@ namespace DotnetAPI.Data
             return users;
         }
 
+        public User GetSingleUserFromDatabase(int userID)
+        {
+            //query Users from db
+            User? user = _entityFramework.Users
+                // filter by PK UserId, u is the variable name, represent every _entityFramework.Users in the Users db
+                .Where(u => u.UserId == userID)
+                // This method returns the first user that matches the condition or null if no match is found.
+                .FirstOrDefault<User>();
+
+            if (user != null)
+            {
+                return user;
+            }
+
+            throw new Exception("Failed to Get User");
+        }
+
+
     }
 }
