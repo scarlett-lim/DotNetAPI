@@ -31,6 +31,7 @@ namespace DotnetAPI.Data
                     optionsBuilder => optionsBuilder.EnableRetryOnFailure());
             }
         }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.HasDefaultSchema("TutorialAppSchema");

@@ -12,11 +12,14 @@ public class UserEFController : ControllerBase
 {
     DataContextEF _entityFramework;
     IMapper _mapper;
+    IUserRepository _userRepository;
 
     // Contructor name must follow file name
-    public UserEFController(IConfiguration config)
+    public UserEFController(IConfiguration config, IUserRepository userRepository)
     {
         _entityFramework = new DataContextEF(config);
+
+        _userRepository = userRepository;
 
         _mapper = new Mapper(new MapperConfiguration(cfg =>
         {
@@ -27,6 +30,7 @@ public class UserEFController : ControllerBase
     [HttpGet("GetUsers")]
     public IEnumerable<User> GetUsers()
     {
+        // IEnumerable<User> users = _entityFramework.Users.ToList<User>();
         IEnumerable<User> users = _entityFramework.Users.ToList<User>();
         return users;
     }
@@ -65,7 +69,7 @@ public class UserEFController : ControllerBase
             userDB.LastName = user.LastName;
             userDB.Gender = user.Gender;
 
-            if (_entityFramework.SaveChanges() > 0)
+            if (_userRepository.SaveChanges())
             {
                 return Ok();
             }
@@ -91,9 +95,9 @@ public class UserEFController : ControllerBase
         User userDB = _mapper.Map<User>(user);
         #endregion
 
-        _entityFramework.Add(userDB);
+        _userRepository.AddEntity<User>(userDB);
 
-        if (_entityFramework.SaveChanges() > 0)
+        if (_userRepository.SaveChanges())
         {
             return Ok();
         }
@@ -112,9 +116,11 @@ public class UserEFController : ControllerBase
 
         if (userDB != null)
         {
-            _entityFramework.Users.Remove(userDB);
+            // _entityFramework.Users.Remove(userDB);
 
-            if (_entityFramework.SaveChanges() > 0)
+            _userRepository.RemoveEntity<User>(userDB);
+
+            if (_userRepository.SaveChanges())
             {
                 return Ok();
             }
