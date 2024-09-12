@@ -10,15 +10,12 @@ namespace DotnetAPI.Controllers;
 [Route("[controller]")]
 public class UserEFController : ControllerBase
 {
-    DataContextEF _entityFramework;
     IMapper _mapper;
     IUserRepository _userRepository;
 
     // Contructor name must follow file name
     public UserEFController(IConfiguration config, IUserRepository userRepository)
     {
-        _entityFramework = new DataContextEF(config);
-
         _userRepository = userRepository;
 
         _mapper = new Mapper(new MapperConfiguration(cfg =>
@@ -30,36 +27,20 @@ public class UserEFController : ControllerBase
     [HttpGet("GetUsers")]
     public IEnumerable<User> GetUsers()
     {
-        // IEnumerable<User> users = _entityFramework.Users.ToList<User>();
-        IEnumerable<User> users = _entityFramework.Users.ToList<User>();
-        return users;
+        return _userRepository.GetUsers();
     }
 
     // Function name no need follow API name
     [HttpGet("GetSingleUser/{userID}")]
     public User GetSingleUserFromDatabase(int userID)
     {
-        //query Users from db
-        User? user = _entityFramework.Users
-        // filter by PK UserId, u is the variable name, represent every _entityFramework.Users in the Users db
-            .Where(u => u.UserId == userID)
-            // This method returns the first user that matches the condition or null if no match is found.
-            .FirstOrDefault<User>();
-
-        if (user != null)
-        {
-            return user;
-        }
-
-        throw new Exception("Failed to Get User");
+        return _userRepository.GetSingleUserFromDatabase(userID);
     }
 
     [HttpPut("EditUser")]
     public IActionResult EditUser(User user)
     {
-        User? userDB = _entityFramework.Users
-                .Where(u => u.UserId == user.UserId)
-                .FirstOrDefault<User>();
+        User? userDB = _userRepository.GetSingleUserFromDatabase(user.UserId);
 
         if (userDB != null)
         {
@@ -110,9 +91,7 @@ public class UserEFController : ControllerBase
     [HttpDelete("DeleteUser/{USERID}")]
     public IActionResult DeleteUser(int UserId)
     {
-        User? userDB = _entityFramework.Users
-                .Where(u => u.UserId == UserId)
-                .FirstOrDefault<User>();
+        User? userDB = _userRepository.GetSingleUserFromDatabase(UserId);
 
         if (userDB != null)
         {
