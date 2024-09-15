@@ -26,7 +26,7 @@ namespace DotnetAPI.Controllers
         {
             if (userForRegistration.Password == userForRegistration.PasswordConfirm)
             {
-                string sqlCheckUserExists = string.Format("SELECT Email FROM TUTORIALAPPSCHEMA.AUTH WHERE EMAIL={0}", userForRegistration.Email);
+                string sqlCheckUserExists = string.Format("SELECT Email FROM TutorialAppSchema.Auth WHERE Email='{0}'", userForRegistration.Email);
 
                 IEnumerable<string> existingUsers = _dapper.LoadData<string>(sqlCheckUserExists);
 
@@ -41,20 +41,7 @@ namespace DotnetAPI.Controllers
                     }
                     #endregion
 
-                    #region Concat the generated passwordSalt with the PasswordKey to make the password stored more secure
-                    string passwordSaltPlusString = _config.GetSection("AppSettings:PasswordKey").Value +
-                        Convert.ToBase64String(passwordSalt);
-                    #endregion
-
-                    #region Hash the password
-                    byte[] passwordHash = KeyDerivation.Pbkdf2(
-                        password: userForRegistration.Password,
-                        salt: Encoding.ASCII.GetBytes(passwordSaltPlusString),
-                        prf: KeyDerivationPrf.HMACSHA256,
-                        iterationCount: 1000,
-                        numBytesRequested: 256 / 8
-                    );
-                    #endregion
+                    byte[] passwordHash = GetPasswordHash(userForRegistration.Password, passwordSalt);
 
                     string sqlAddAuth = @"
                         INSERT INTO TutorialAppSchema.Auth([Email],
@@ -90,8 +77,45 @@ namespace DotnetAPI.Controllers
         [HttpPost("Login")]
         public IActionResult Login(UserForLoginDto userForLogin)
         {
+            string sqlForHashAndSalt = @"SELECT 
+                [PasswordHash],
+                [PasswordSalt] FROM TutorialAppSchema.Auth WHERE Email = '" +
+            userForLogin.Email + "'";
+
+            UserForLoginConfirmationDto userForLoginConfirmationDto = _dapper
+                .LoadDataSingle<UserForLoginConfirmationDto>(sqlForHashAndSalt);
+
+            byte[] passwordHash = GetPasswordHash(userForLogin.Password, userForLoginConfirmationDto.PasswordSalt);
+            for (int i = 0; i < passwordHash.Length; i++)
+            {
+                if (passwordHash[i] != userForLoginConfirmationDto.PasswordHash[i])
+                {
+                    return StatusCode(401, "Unauthorised access!");
+                }
+            }
+
             return Ok();
         }
 
+        // Hashing will always return the same value
+        private byte[] GetPasswordHash(string password, byte[] passwordSalt)
+        {
+            #region Concat the generated passwordSalt with the PasswordKey to make the password stored more secure
+            string passwordSaltPlusString = _config.GetSection("AppSettings:PasswordKey").Value +
+                Convert.ToBase64String(passwordSalt);
+            #endregion
+
+            #region Hash the password
+            byte[] passwordHash = KeyDerivation.Pbkdf2(
+                password: password,
+                salt: Encoding.ASCII.GetBytes(passwordSaltPlusString),
+                prf: KeyDerivationPrf.HMACSHA256,
+                iterationCount: 1000,
+                numBytesRequested: 256 / 8
+            );
+            #endregion
+
+            return passwordHash;
+        }
     }
 }
