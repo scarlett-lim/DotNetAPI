@@ -1,4 +1,5 @@
 using System.Data;
+using System.Runtime.CompilerServices;
 using Dapper;
 using Microsoft.Data.SqlClient;
 
@@ -39,5 +40,28 @@ namespace DotnetAPI.Data
         {
             return _dbConnection.Execute(sql);
         }
+
+        public bool ExecuteSqlWithParameters(string sql, List<SqlParameter> passedInParameters)
+        {
+            SqlCommand commandWithParameters = new SqlCommand(sql);
+
+            foreach (SqlParameter passedInParameter in passedInParameters)
+            {
+                commandWithParameters.Parameters.Add(passedInParameter);
+            }
+
+            SqlConnection dbConnection = new SqlConnection(_config.GetConnectionString("DefaultConnection"));
+
+            dbConnection.Open();
+
+            commandWithParameters.Connection = dbConnection;
+
+            int rowsAffected = commandWithParameters.ExecuteNonQuery();
+
+            dbConnection.Close();
+
+            return rowsAffected > 0;
+        }
+
     }
 }

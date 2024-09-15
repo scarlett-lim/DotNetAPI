@@ -2,10 +2,10 @@ namespace DotnetAPI.Model
 {
     public partial class UserSalary
     {
-        public UserSalary()
-        {
+        // public UserSalary()
+        // {
 
-        }
+        // }
 
         public int UserId { get; set; }
 
