@@ -46,11 +46,13 @@ namespace DotnetAPI.Controllers
                     string sqlAddAuth = @"
                         INSERT INTO TutorialAppSchema.Auth([Email],
                         [PasswordHash],
-                        [PasswordSalt]) VALUES ('" + userForRegistration.Email +
-                        "', @PasswordHash, @PasswordSalt)";
+                        [PasswordSalt]) VALUES (@Email, @PasswordHash, @PasswordSalt)";
 
                     //DECLARE THE PARAMETERS TO BE PASSED INTO DB
                     List<SqlParameter> sqlParameters = new List<SqlParameter>();
+
+                    SqlParameter emailParameter = new SqlParameter("@Email", SqlDbType.VarChar);
+                    emailParameter.Value = userForRegistration.Email;
 
                     SqlParameter passwordSaltParameter = new SqlParameter("@PasswordSalt", SqlDbType.VarBinary);
                     passwordSaltParameter.Value = passwordSalt;
@@ -58,12 +60,31 @@ namespace DotnetAPI.Controllers
                     SqlParameter passwordHashParameter = new SqlParameter("@PasswordHash", SqlDbType.VarBinary);
                     passwordHashParameter.Value = passwordHash;
 
-                    sqlParameters.Add(passwordSaltParameter);
+                    sqlParameters.Add(emailParameter);
                     sqlParameters.Add(passwordHashParameter);
+                    sqlParameters.Add(passwordSaltParameter);
 
                     if (_dapper.ExecuteSqlWithParameters(sqlAddAuth, sqlParameters))
                     {
-                        return Ok();
+                        string sqlAddUser = @"
+                            INSERT INTO TutorialAppSchema.Users(
+                                [FirstName],
+                                [LastName],
+                                [Email],
+                                [Gender],
+                                [Active]
+                            ) VALUES (" +
+                                "'" + userForRegistration.FirstName +
+                                "', '" + userForRegistration.LastName +
+                                "', '" + userForRegistration.Email +
+                                "', '" + userForRegistration.Gender +
+                                "', 1)";
+
+                        if (_dapper.ExecuteSql(sqlAddUser))
+                        {
+                            return Ok();
+                        }
+                        throw new Exception("Failed to add user.");
                     }
                     throw new Exception("Failed to register user.");
 
