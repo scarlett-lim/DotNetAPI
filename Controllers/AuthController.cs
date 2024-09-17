@@ -96,7 +96,6 @@ namespace DotnetAPI.Controllers
                         throw new Exception("Failed to add user.");
                     }
                     throw new Exception("Failed to register user.");
-
                 }
                 throw new Exception("User with this email already exists!");
             }
