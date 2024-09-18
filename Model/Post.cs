@@ -1,13 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+
 
 namespace DotnetAPI.Model;
 // {
-public partial class Posts
+public partial class Post
 {
-    public Posts()
+    public Post()
     {
         PostTitle ??= "";
         PostContent ??= "";
